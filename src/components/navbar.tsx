@@ -52,7 +52,7 @@ const Navbar = () => {
             !userId ? (<Link href={"http://localhost:3000/sign-in"}><FaUserCircle/></Link>) : (<UserButton />)
           }
         </div>
-        <Link href="http://localhost:3000/allproducts">
+        <Link href="http://localhost:3000/checkoutProduct">
           <div className='flex py-3'>
             <BsCartCheck className='tablet:block hidden' />
             <CartData />

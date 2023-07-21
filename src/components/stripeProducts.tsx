@@ -54,7 +54,6 @@ export default function Product() {
     if (result?.error) {
       alert(result.error.message);
     }
-    // setLoading(false);
   };
   
   const changeQuantity = (value: number) => {

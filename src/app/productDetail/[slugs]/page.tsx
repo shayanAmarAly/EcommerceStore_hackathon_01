@@ -55,12 +55,13 @@ const Page = ({ params }: { params: { slugs: string } }) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  const UUID = generateRandomNumber();
-
+  
   const postContent = async (item: any) => {
     console.log(item);
     console.log("unique id", uuid);
+    // console.log("unique id", UUID);
     console.log("user id is ", userId);
+    const UUID = generateRandomNumber();
     const request = await fetch("http://localhost:3000/api/cart", {
       method: "POST",
       headers: {

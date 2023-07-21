@@ -60,6 +60,36 @@ const Product = () => {
     changeQuantity(parseInt(e.target.value));
   };
 
+  
+  const publishableKey = process.env
+    .NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string;
+  const stripePromise = loadStripe(publishableKey);
+
+  const createCheckOutSession = async () => {
+    const stripe = await stripePromise;
+    const checkoutSession = await fetch(
+      "http://localhost:3000/api/create-stripe-session",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({data}),
+      }
+    );
+
+    console.log("Result------------- in prod page==========", checkoutSession);
+
+    const sessionID = await checkoutSession.json();
+    const result = await stripe?.redirectToCheckout({
+      sessionId: sessionID,
+    });
+    if (result?.error) {
+      alert(result.error.message);
+    }
+  };
+
+
   const deleteCartItem = async (productId: any) => {
     console.log("method triggered with productID",productId);
     const response = await fetch(`http://localhost:3000/api/cart?productId=${productId}`, {
@@ -73,6 +103,10 @@ const Product = () => {
     dispatch(fetchCartData());
     return response.json();
   }
+
+  const totalPrice: number = data.map((product) => product.price).reduce((acc, price) => acc + price, 0);
+  console.log(totalPrice);
+
 
   useEffect(() => {
     dispatch(fetchCheckoutData());
@@ -124,12 +158,19 @@ const Product = () => {
             
                       <div className='flex justify-between mt-5' >
                         <p>Quantity</p>
-                        <p>1 Product/s</p>
+                        <p>{data.length} Product/s</p>
                       </div>
                       <div className='flex justify-between mt-3'  >
                         <p>Price</p>
-                        <p>$75</p>
+                        <p>${totalPrice}</p>
                       </div>
+                      <button
+          disabled={data.length === 0}
+          onClick={createCheckOutSession}
+          className="bg-black text-white w-[240px] text-center py-2 font-semibold mt-5 disabled:cursor-not-allowed disabled:bg-blue-100"
+        >
+         {loading ? 'Processing...' : 'checkout to proceed'}
+        </button>
                       <button className='bg-black text-white w-[240px] text-center py-2 font-semibold mt-5'> Process to Checkout</button>
                     </div>
 
