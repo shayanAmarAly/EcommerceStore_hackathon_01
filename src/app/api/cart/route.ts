@@ -1,11 +1,6 @@
 import { UsersTable, db, User, NewUser } from "@/lib/drizzle";
 import { NextRequest, NextResponse } from "next/server";
-import { eq, like } from "drizzle-orm";
-import { currentUser } from "@clerk/nextjs/server";
-import { getAuth, clerkClient } from "@clerk/nextjs/server";
-import { auth } from '@clerk/nextjs';
-import { getCookie } from "cookies-next";
-
+import { eq } from "drizzle-orm";
 
 const newEntry: NewUser = {
   id: 1,
@@ -17,22 +12,22 @@ const newEntry: NewUser = {
 };
 
 export async function GET(req: NextRequest) {
-  // const retrive = await db.select().from(UsersTable);
-  const abc = req.cookies.get('useriid');
-  console.log("cookies are ",abc?.value);
-  // const response = NextResponse.next();
-  // // const cookie = setCookie("useriid", `${}`);
-  // const cookie = getCookie("useriid")?.valueOf();
-  //   console.log(response.cookies.get('useriid'));
-    const retrive = await db.select().from(UsersTable).where(eq(UsersTable.userid, `${abc?.value}`));
-  console.log("get request is triggered...",retrive);
-  return NextResponse.json({message1: retrive})
+  const cookie = req.cookies.get("useriid");
+  if (cookie?.value){
+    console.log("cookies are ", cookie?.value);
+    const retrive = await db
+      .select()
+      .from(UsersTable)
+      .where(eq(UsersTable.userid, `${cookie?.value}`));
+    console.log("get request is triggered...", retrive);
+    return NextResponse.json({ message1: retrive });
+  }
+  return NextResponse.json({
+    message: "You are not authenticated user Please SIGN-IN to continue"
+  })
 }
 
-
-
-
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   const { id, userid, productid, title, price, image } = await req.json();
 
   const responseObject: NewUser = {
@@ -43,43 +38,30 @@ export async function POST(req: NextRequest, res: NextResponse) {
     price: price,
     image: image,
   };
-  const sendData = await db.insert(UsersTable).values(responseObject).returning();
-
-  // Then set a cookie
-  // res.cookies.set({
-  //   name: 'userid',
-  //   value: userid,
-  //   httpOnly: true,
-  //   maxAge: 3600,
-  // })
-
-  return NextResponse.json({message1: sendData})
-
-  // return NextResponse.json({
-  //   message1: sendData,
-  // });
+  const sendData = await db
+    .insert(UsersTable)
+    .values(responseObject)
+    .returning();
+  return NextResponse.json({ message1: sendData });
 }
 
 export const DELETE = async (req: NextRequest, res: NextResponse) => {
-  // if (req.method !== 'DELETE') {
-  //   res.status(405).json({ message: 'Method Not Allowed' });
-  //   return;
-  // }
+  const productID = req.nextUrl.searchParams.get("productId");
 
-  //   const url = req.nextUrl.searchParams;
-  let productID: String | null;
-  if (typeof (req.nextUrl.searchParams.get("productId")) == "string") {
-    productID = req.nextUrl.searchParams.get("productId");
+  if (productID !== null) {
+    let id: number = parseInt(productID);
+    console.log(id);
+
+    const deletedProduct = await db.delete(UsersTable).where(eq(UsersTable.id, id)).returning({ name: UsersTable.title });
+
+    return NextResponse.json({
+      message: deletedProduct,
+    });
+  } else {
+    return NextResponse.json({
+
+      message: "Product ID not found in the URL.",
+    });
   }
-  // const pID = String(productID)
-
-  const deletedProduct = await db.delete(UsersTable)
-    .where(eq(UsersTable.id, productID))
-    .returning({ name: UsersTable.title });
-
-  //   const response = await db.delete(UsersTable).where(eq(productId, `${url}`));
-  return NextResponse.json({
-    message: deletedProduct
-  })
 };
 

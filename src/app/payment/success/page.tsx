@@ -1,7 +1,7 @@
 import React from 'react'
 import { TiTick } from "react-icons/ti"
 import { RiDeleteBin7Line } from "react-icons/ri"
-
+import Link from 'next/link'
 const page = () => {
   return (
     <>
@@ -29,7 +29,9 @@ const page = () => {
             </div>
           </div>
           <div className='mt-10'>
-            <button className='bg-green-800 font-semibold rounded-lg w-40 h-10 text-white'>New Site</button>
+            <button className='bg-green-800 font-semibold rounded-lg w-40 h-10 text-white'>
+              <Link href={"/"}>New Site</Link>
+              </button>
             <button className='border-green-800 tablet:ml-5 font-semibold border-2 rounded-lg w-40 h-10 text-green-800'> Back Home</button>
           </div>
         </div>

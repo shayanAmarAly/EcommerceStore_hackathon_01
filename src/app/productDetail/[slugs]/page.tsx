@@ -1,17 +1,13 @@
 "use client"
-import { stringify, v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { client } from "../../../../sanity/lib/client";
-import { use } from "react";
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
-import realoding from "@/components/navbar"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from '@/app/store'
 import { fetchCartData } from '@/app/counter/counterSlice';
 import { toast } from 'react-hot-toast';
-import { currentUser, auth } from '@clerk/nextjs';
 
 const detail = async (param: any) => {
   const bac = `${param}`;
@@ -20,13 +16,9 @@ const detail = async (param: any) => {
   return response;
 }
 
-
-const notify = () => toast("Product added into cart");
-
 const Page = ({ params }: { params: { slugs: string } }) => {
   const [item, setItem] = useState<any>();
   const [count, setCount] = useState(0);
-  // const { userId } = auth();
   const { userId } = useAuth();
     console.log("product detail page user id is " , userId);
   console.log(typeof userId);
@@ -55,12 +47,7 @@ const Page = ({ params }: { params: { slugs: string } }) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  
   const postContent = async (item: any) => {
-    console.log(item);
-    console.log("unique id", uuid);
-    // console.log("unique id", UUID);
-    console.log("user id is ", userId);
     const UUID = generateRandomNumber();
     const request = await fetch("http://localhost:3000/api/cart", {
       method: "POST",
@@ -77,7 +64,6 @@ const Page = ({ params }: { params: { slugs: string } }) => {
       })
     });
     const jsonResponse = await request.json();
-    console.log("response you got the server in case of POST data nto db", jsonResponse);
     dispatch(fetchCartData());
     return jsonResponse;
   };
@@ -168,10 +154,8 @@ const Page = ({ params }: { params: { slugs: string } }) => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-
       ) : (
         <h1>Products are in a loading state</h1>
       )}

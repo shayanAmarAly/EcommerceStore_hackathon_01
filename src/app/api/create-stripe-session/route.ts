@@ -9,26 +9,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 export  async function POST(req: any, res: NextResponse){
     const { data } = await req.json();
     console.log(data);
-    // const transformedItem = {
-    //      price_data: {
-    //       currency: 'usd',
-    //       product_data:{
-    //         name: [item.name],
-    //         description:[ item.description],
-    //         images:[item.image],
-    //         metadata:{},
-
-    //       },
-    //       unit_amount: item.price * 100,
-
-    //     },
-    //     quantity: [item.quantity],
-        
-    //   };
       const redirectURL =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:3000'
-      : 'your deployed url';
+      : 'https://ecoomerec.vercel.app';
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
